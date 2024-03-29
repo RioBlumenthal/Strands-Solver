@@ -1,3 +1,13 @@
 Step one is to get the grid from Strands
 So start a browser window, go to strands, click Ok 
 Then click on the done button to skip the ad
+
+First make a list of every word on the board 
+expressed as either (a 48 bit numbers where a 1 means there
+is a letter there in the word and 0 means there isn't) or (a
+list of the indexes of the letters in the word within the board)
+
+then determine either the number of 1s or the length of the list and make a list
+of all the possible combinations of n words whose length adds up to 48
+
+then go through that list and check if they have overlap or not (bitwise operation?)

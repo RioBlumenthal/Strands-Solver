@@ -38,6 +38,8 @@ for x in range(ROWS):
       board[x][y] = board_from_web.find_element(By.ID, f'button-{buttonAt}').text[0]
       buttonAt += 1
 
+
+
 printBoard(board)
 
 driver.quit()
