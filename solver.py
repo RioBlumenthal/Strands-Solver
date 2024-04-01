@@ -3,6 +3,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 
+#import nltk
+from nltk.corpus import words
+
+from trie import Trie
+from trie import TrieNode
+
 def printBoard(board):
    for row in board:
       for letter in row:
@@ -35,7 +41,12 @@ for x in range(ROWS):
       board[x][y] = board_from_web.find_element(By.ID, f'button-{buttonAt}').text[0]
       buttonAt += 1
 
+#nltk.download('words')
+english_words = words.words('en')
 
+trie = Trie()
+for word in english_words:
+   trie.insert(word.lower())
 
 printBoard(board)
 

@@ -1,7 +1,4 @@
-import nltk
-from nltk.corpus import words
 class TrieNode:
-     
     # Trie node class
     def __init__(self):
         self.children = [None for _ in range(26)]
@@ -17,8 +14,8 @@ class Trie:
  
     def getNode(self):
      
-        # Returns new trie node (initialized to NULLs)
-        return TrieNode()
+      # Returns new trie node (initialized to NULLs)
+      return TrieNode()
  
     def _charToIndex(self,ch):
          
@@ -27,7 +24,6 @@ class Trie:
         # use only 'a' through 'z' and lower case
          
         return ord(ch)-ord('a')
- 
  
     def insert(self,key):
          
@@ -38,7 +34,6 @@ class Trie:
         length = len(key)
         for level in range(length):
             index = self._charToIndex(key[level])
- 
             # if current character is not present
             if not pCrawl.children[index]:
                 pCrawl.children[index] = self.getNode()
