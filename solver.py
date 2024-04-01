@@ -3,9 +3,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 
-import nltk
-from nltk.corpus import words
-
 def printBoard(board):
    for row in board:
       for letter in row:
