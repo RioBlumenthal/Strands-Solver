@@ -2,8 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-
+from selenium.webdriver.chrome.service import Service
 
 from nltk.corpus import words
 
@@ -27,21 +26,23 @@ ROWS = 8
 COLS = 6
 
 # path to chromedriver
-CHROMEDRIVER_PATH = 'C:/Users/Rio/OneDrive/Documents/Python happies/chromedriver.exe'
+CHROMEDRIVER_PATH = "C:/Users/Rio/OneDrive/Documents/Python happies/chromedriver-win64/chromedriver.exe"
 
 # min/max length of words
 MIN_WORD_LENGTH = 4
 MAX_WORD_LENGTH = 12
 
 
-# launch the browser and click through start screen to get to puzzle
-options = Options()
-options.add_argument("--headless")
-driver = webdriver.Chrome(options=options, executable_path=CHROMEDRIVER_PATH)
+# launch the browser and click through start screen to get to puzzle 
+service = Service(executable_path=CHROMEDRIVER_PATH)
+options = webdriver.ChromeOptions()
+options.add_argument('--headless')
+driver = webdriver.Chrome(service=service,
+options=options)
 driver.get("https://www.nytimes.com/games/strands")
 
 start_button = WebDriverWait(driver, 10).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, start_button_class)))
-start_button.click()
+start_button.click() 
 
 close_button = WebDriverWait(driver, 2).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, close_button_class)))
 close_button.click()
@@ -57,6 +58,8 @@ for x in range(ROWS):
 
 # close the web browser
 driver.quit()
+
+printBoard(board)
 
 # get a list of all english words from nltk
 english_words = [word.lower() for word in words.words() if word.isalpha()]
