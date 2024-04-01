@@ -44,7 +44,7 @@ board = [[0 for x in range(COLS)] for y in range(ROWS)]
 buttonAt = 0
 for x in range(ROWS):
    for y in range(COLS):
-      board[x][y] = board_from_web.find_element(By.ID, f'button-{buttonAt}').text[0]
+      board[x][y] = board_from_web.find_element(By.ID, f'button-{buttonAt}').text[0].lower()
       buttonAt += 1
 
 # get a list of all english words from nltk
