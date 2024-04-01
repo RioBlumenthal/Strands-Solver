@@ -24,6 +24,10 @@ board_class = 'UOpmtW_board'
 ROWS = 8
 COLS = 6
 
+# min/max length of words
+MIN_WORD_LENGTH = 4
+MAX_WORD_LENGTH = 12
+
 # launch the browser and click through start screen to get to puzzle
 driver = webdriver.Chrome()
 driver.get("https://www.nytimes.com/games/strands")
@@ -51,22 +55,32 @@ trie = Trie()
 for word in english_words:
    trie.insert(word.lower())
 
-# function to find all words in the board
+# function to find all words in the board and return 
+# a list of the 48 bit representations of the words
+# where each bit represents a letter in the board
+# with 1 being the letter is used and 0 being the letter is not used in the word
+   
+def findWords(board, trie):
+   words = []
+   for x in range(ROWS):
+      for y in range(COLS):
+         visited = [[False for i in range(COLS)] for j in range(ROWS)]
+         findWordsHelper(board, trie, x, y, visited, board[x][y], words)
+   return words
 
-def findWords(board, row, col, visited, str, trie, words):
-   # mark the current cell as visited
-   visited[row][col] = True
-   # add the current character to the string
-   str += board[row][col]
-   # if the string is a word, add it to the list of words
-   if trie.search(str):
-      words.append(str)
-   # check all 8 directions
-   for i in range(-1, 2):
-      for j in range(-1, 2):
-         if row + i >= 0 and row + i < ROWS and col + j >= 0 and col + j < COLS and not visited[row + i][col + j]:
-            findWords(board, row + i, col + j, visited, str, trie, words)
-   # mark the current cell as not visited
-   visited[row][col] = False
+def findWordsHelper(board, trie, x, y, visited, word, words):
+   visited[x][y] = True
+   if trie.search(word) and len(word) >= MIN_WORD_LENGTH and len(word) <= MAX_WORD_LENGTH:
+      words.append(word)
+   if trie.startsWith(word):
+      for i in range(-1, 2):
+         for j in range(-1, 2):
+            if x + i >= 0 and x + i < ROWS and y + j >= 0 and y + j < COLS and not visited[x + i][y + j]:
+               findWordsHelper(board, trie, x + i, y + j, visited, word + board[x + i][y + j], words)
+   visited[x][y] = False
+
+# find all words in the board
+words = findWords(board, trie)
+print(words)
 
 driver.quit()
