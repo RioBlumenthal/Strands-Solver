@@ -42,7 +42,7 @@ for x in range(ROWS):
       buttonAt += 1
 
 #nltk.download('words')
-english_words = words.words('en')
+english_words = [word.lower() for word in words.words() if word.isalpha()]
 
 trie = Trie()
 for word in english_words:
