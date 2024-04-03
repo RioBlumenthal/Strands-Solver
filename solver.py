@@ -79,10 +79,10 @@ def findWords(board, trie):
    for x in range(ROWS):
       for y in range(COLS):
          visited = [[False for i in range(COLS)] for j in range(ROWS)]
-         findWordsHelper(board, trie, x, y, visited, board[x][y], words)
+         findWordsHelper(board, trie, x, y, visited, board[x][y], words, 1 << (x * COLS + y))
    return words
 
-def findWordsHelper(board, trie, x, y, visited, word, words):
+def findWordsHelper(board, trie, x, y, visited, word, words, bitwiseWord):
    visited[x][y] = True
    if trie.search(word) and len(word) >= MIN_WORD_LENGTH and len(word) <= MAX_WORD_LENGTH:
       words.append(word)
@@ -90,7 +90,7 @@ def findWordsHelper(board, trie, x, y, visited, word, words):
       for i in range(-1, 2):
          for j in range(-1, 2):
             if x + i >= 0 and x + i < ROWS and y + j >= 0 and y + j < COLS and not visited[x + i][y + j]:
-               findWordsHelper(board, trie, x + i, y + j, visited, word + board[x + i][y + j], words)
+               findWordsHelper(board, trie, x + i, y + j, visited, word + board[x + i][y + j], words, bitwiseWord | 1 << ((x + i) * COLS + y + j))
    visited[x][y] = False 
 
 # find all words in the board
