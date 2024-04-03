@@ -56,3 +56,15 @@ class Trie:
             pCrawl = pCrawl.children[index]
  
         return pCrawl.isEndOfWord
+    
+    def startsWith(self, prefix):
+            # Returns true if prefix 
+            # presents in trie, else false
+            pCrawl = self.root
+            length = len(prefix)
+            for level in range(length):
+                index = self._charToIndex(prefix[level])
+                if not pCrawl.children[index]:
+                    return False
+                pCrawl = pCrawl.children[index]
+            return True
