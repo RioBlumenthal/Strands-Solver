@@ -4,11 +4,14 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 
-from nltk.corpus import words
+import nltk
+from nltk.corpus import wordnet as words
+
+import re
 
 from trie import Trie
-from trie import TrieNode
 
+nltk.download('wordnet')
 # function to print the 2d array in board form
 def printBoard(board):
    for row in board:
@@ -47,6 +50,20 @@ start_button.click()
 close_button = WebDriverWait(driver, 2).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, close_button_class)))
 close_button.click()
 
+p_elements = driver.find_elements(By.TAG_NAME, "p")
+
+# regex pattern
+pattern = r"0 of (\d+) theme words found."
+num_words = 0
+for p_element in p_elements:
+   # Get the text
+   text = p_element.text
+
+   matches = re.match(pattern, text)
+   if matches:
+      num_words = matches.group(1)
+      break
+   
 # get the puzzle and store as 2d array
 board_from_web = WebDriverWait(driver, 2).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, board_class)))
 board = [[0 for x in range(COLS)] for y in range(ROWS)]
@@ -99,3 +116,6 @@ def findWordsHelper(board, trie, x, y, visited, word, words, bitwiseWord):
 
 # find all words in the board 
 words = findWords(board, trie)
+
+if "hips" in words:
+   print("hips is in the board")
