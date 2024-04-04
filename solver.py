@@ -79,6 +79,8 @@ printBoard(board)
 trie = Trie()
 with open("words_alpha.txt", "r") as file:
    for line in file:
+
+      # make sure the word is within the min/max length and is alphabetical
       line = line.strip().lower()
       if len(line) >= MIN_WORD_LENGTH and len(line) <= MAX_WORD_LENGTH and line.isalpha():
          trie.insert(line)
@@ -91,13 +93,17 @@ with open("words_alpha.txt", "r") as file:
 def findWords(board, trie):
    words = []
    wordsArray = []
+
+   # for each letter on the board, call the helper function to find all the words
+   # that start with that letter
    for x in range(ROWS):
       for y in range(COLS):
          visited = [[False for i in range(COLS)] for j in range(ROWS)]
          wordLocationArray = [[0 for i in range(COLS)] for j in range(ROWS)]
          findWordsHelper(board, trie, x, y, visited, board[x][y], words, wordLocationArray, wordsArray)
-   return words
+   return wordsArray
 
+# helper function to find all words that start with a given letter on the board
 def findWordsHelper(board, trie, x, y, visited, word, words, wordLocationArray, wordsArray):
    visited[x][y] = True
    wordLocationArray[x][y] = 1
@@ -114,6 +120,7 @@ def findWordsHelper(board, trie, x, y, visited, word, words, wordLocationArray, 
                wordLocationArray[x + i][y + j] = 1
                findWordsHelper(board, trie, x + i, y + j, visited, word + board[x + i][y + j], words, wordLocationArray, wordsArray)
    visited[x][y] = False 
+   wordLocationArray[x][y] = 0
 
 # find all words in the board 
 words = findWords(board, trie)
