@@ -4,14 +4,10 @@ from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 
-import nltk
-from nltk.corpus import wordnet as words
-
 import re
 
 from trie import Trie
 
-nltk.download('wordnet')
 # function to print the 2d array in board form
 def printBoard(board):
    for row in board:
@@ -78,13 +74,13 @@ driver.quit()
 
 printBoard(board)
 
-# get a list of all english words from nltk
-english_words = [word.lower() for word in words.words() if word.isalpha()]
-
 # insert all english words into a trie
 trie = Trie()
-for word in english_words:
-   trie.insert(word.lower())
+with open("words_alpha.txt", "r") as file:
+   for line in file:
+      line = line.strip().lower()
+      if len(line) >= MIN_WORD_LENGTH and len(line) <= MAX_WORD_LENGTH and line.isalpha():
+         trie.insert(line)
 
 # function to find all words in the board and return 
 # a list of the 48 bit representations of the words
@@ -117,5 +113,4 @@ def findWordsHelper(board, trie, x, y, visited, word, words, bitwiseWord):
 # find all words in the board 
 words = findWords(board, trie)
 
-if "hips" in words:
-   print("hips is in the board")
+print(words)
