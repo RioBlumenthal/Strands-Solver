@@ -6,6 +6,8 @@ from selenium.webdriver.chrome.service import Service
 
 import re
 
+import PySimpleGUI as sg
+
 from trie import Trie
 
 # function to print the 2d array in board form
@@ -30,7 +32,6 @@ CHROMEDRIVER_PATH = "C:/Users/Rio/OneDrive/Documents/Python happies/chromedriver
 # min/max length of words
 MIN_WORD_LENGTH = 4
 MAX_WORD_LENGTH = 12
-
 
 # launch the browser and click through start screen to get to puzzle 
 service = Service(executable_path=CHROMEDRIVER_PATH)
@@ -99,7 +100,7 @@ def findWordsHelper(board, trie, x, y, visited, word, words, bitwiseWord):
    visited[x][y] = True
    if trie.search(word) and len(word) >= MIN_WORD_LENGTH and len(word) <= MAX_WORD_LENGTH:
       words.append(word)
-      if(word == "wicked"):
+      if(word == "bread"):
          print(word)
          print(format(bitwiseWord, '048b'))
    if trie.startsWith(word):
@@ -114,3 +115,13 @@ def findWordsHelper(board, trie, x, y, visited, word, words, bitwiseWord):
 words = findWords(board, trie)
 
 print(words)
+
+def TextChar(value, key):
+    return sg.Input(value, key=key, font='Courier 22', size=(1,1),  disabled_readonly_background_color='gray', border_width=1,  p=1, enable_events=True, disabled=True)
+
+layout = [[sg.Text('Strands', font='_ 20')],
+              [[TextChar('', (row, col)) for col in range(5)]for row in range(6)],
+              [sg.B('Enter', bind_return_key=True)],
+              [sg.Text('Or press enter', font='_ 10')]]
+
+window = sg.Window("Strands", layout, finalize=True, element_justification='c')
