@@ -90,25 +90,29 @@ with open("words_alpha.txt", "r") as file:
    
 def findWords(board, trie):
    words = []
+   wordsArray = []
    for x in range(ROWS):
       for y in range(COLS):
          visited = [[False for i in range(COLS)] for j in range(ROWS)]
-         findWordsHelper(board, trie, x, y, visited, board[x][y], words, 1 << (x * COLS + y))
+         wordLocationArray = [[0 for i in range(COLS)] for j in range(ROWS)]
+         findWordsHelper(board, trie, x, y, visited, board[x][y], words, wordLocationArray, wordsArray)
    return words
 
-def findWordsHelper(board, trie, x, y, visited, word, words, bitwiseWord):
+def findWordsHelper(board, trie, x, y, visited, word, words, wordLocationArray, wordsArray):
    visited[x][y] = True
+   wordLocationArray[x][y] = 1
    if trie.search(word) and len(word) >= MIN_WORD_LENGTH and len(word) <= MAX_WORD_LENGTH:
       words.append(word)
+      wordsArray.append(wordLocationArray)
       if(word == "bread"):
          print(word)
-         print(format(bitwiseWord, '048b'))
+         printBoard(wordLocationArray)
    if trie.startsWith(word):
       for i in range(-1, 2):
          for j in range(-1, 2):
             if x + i >= 0 and x + i < ROWS and y + j >= 0 and y + j < COLS and not visited[x + i][y + j]:
-               new_bitwiseWord = (bitwiseWord << 1) | 1
-               findWordsHelper(board, trie, x + i, y + j, visited, word + board[x + i][y + j], words, new_bitwiseWord)
+               wordLocationArray[x + i][y + j] = 1
+               findWordsHelper(board, trie, x + i, y + j, visited, word + board[x + i][y + j], words, wordLocationArray, wordsArray)
    visited[x][y] = False 
 
 # find all words in the board 
@@ -116,12 +120,13 @@ words = findWords(board, trie)
 
 print(words)
 
-def TextChar(value, key):
-    return sg.Input(value, key=key, font='Courier 22', size=(1,1),  disabled_readonly_background_color='gray', border_width=1,  p=1, enable_events=True, disabled=True)
+# generate a GUI to show the board
+layout = [[sg.Button(board[x][y], size=(3, 3), pad=(1, 1), button_color=('white', 'black'), key=(x, y)) for y in range(COLS)] for x in range(ROWS)]
+window = sg.Window("Strands Solver", layout)
 
-layout = [[sg.Text('Strands', font='_ 20')],
-              [[TextChar('', (row, col)) for col in range(5)]for row in range(6)],
-              [sg.B('Enter', bind_return_key=True)],
-              [sg.Text('Or press enter', font='_ 10')]]
+while True:
+   event, values = window.read()
+   if event == sg.WINDOW_CLOSED:
+      break
 
-window = sg.Window("Strands", layout, finalize=True, element_justification='c')
+window.close()
