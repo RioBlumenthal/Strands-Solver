@@ -78,17 +78,24 @@ for x in range(ROWS):
 # close the web browser
 driver.quit()
 
+def is_lowercase(word):
+    return bool(re.match(r'^[a-z]+$', word))
+
 printBoard(board)
 
 # insert all english words into a trie
 trie = Trie()
-with open("wiki-100k.txt", "r") as file:
+with open("30k.txt", "r", encoding="utf-8") as file:
    for line in file:
 
       # make sure the word is within the min/max length and is alphabetical
       line = line.strip().lower()
-      if len(line) >= MIN_WORD_LENGTH and len(line) <= MAX_WORD_LENGTH and line.isalpha():
-         trie.insert(line)
+      if (len(line) >= MIN_WORD_LENGTH) and (len(line) <= MAX_WORD_LENGTH) and is_lowercase(line):
+         try:
+            trie.insert(line)
+         except IndexError:
+            print(f"Error with: {line}")
+            raise  # Re-raise the exception to stop further processing
 
 # function to find all words in the board and return 
 # a list of the 48 bit representations of the words
@@ -145,7 +152,7 @@ def count_ones(binary_number):
 
 # find all words in the board 
 words, wordsInBinary = findWords(board, trie)
-
+count = 0
 for i in range(len(wordsInBinary)):
    for j in range(i + 1, len(wordsInBinary)):
       if wordsInBinary[i] & wordsInBinary[j] == 0:
@@ -160,7 +167,12 @@ for i in range(len(wordsInBinary)):
                         if thingsToConsider & wordsInBinary[m] == 0:
                            thingsToConsider = thingsToConsider | wordsInBinary[m]
                            if count_ones(thingsToConsider) >= 36:
-                              print(words[i], words[j], words[k], words[l], words[m])
+                              count += 1
+                              if(count % 1000 == 0):
+                                 print(count)
+                              #print(words[i], words[j], words[k], words[l], words[m])
+
+print(count)
 # generate a GUI to show the board
 layout = [[sg.Button(board[x][y], size=(3, 3), pad=(1, 1), button_color=('white', 'black'), key=(x, y)) for y in range(COLS)] for x in range(ROWS)]
 window = sg.Window("Strands Solver", layout)
