@@ -3,9 +3,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 
 import re
-
 import PySimpleGUI as sg
 
 from trie import Trie
@@ -33,10 +33,13 @@ CHROMEDRIVER_PATH = "C:/Users/Rio/OneDrive/Documents/Python happies/chromedriver
 MIN_WORD_LENGTH = 4
 MAX_WORD_LENGTH = 12
 
+
 # launch the browser and click through start screen to get to puzzle 
 service = Service(executable_path=CHROMEDRIVER_PATH)
 options = webdriver.ChromeOptions()
 options.add_argument('--headless')
+options.add_argument('--disable-third-party-cookies')
+options.add_argument('--log-level=3')
 driver = webdriver.Chrome(service=service,
 options=options)
 driver.get("https://www.nytimes.com/games/strands")
@@ -60,6 +63,8 @@ for p_element in p_elements:
    if matches:
       num_words = matches.group(1)
       break
+
+print(f"Number of theme words: {num_words}")
    
 # get the puzzle and store as 2d array
 board_from_web = WebDriverWait(driver, 2).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, board_class)))
@@ -107,12 +112,17 @@ def findWords(board, trie):
 def findWordsHelper(board, trie, x, y, visited, word, words, wordLocationArray, wordsArray):
    visited[x][y] = True
    wordLocationArray[x][y] = 1
-   if trie.search(word) and len(word) >= MIN_WORD_LENGTH and len(word) <= MAX_WORD_LENGTH:
+
+   # check if the current thing is a word
+   if trie.search(word):
       words.append(word)
       wordsArray.append(wordLocationArray)
-      if(word == "bread"):
+      """
+      if(word == "moan"):
          print(word)
-         printBoard(wordLocationArray)
+         printBoard(wordLocationArray)"""
+
+   # check all the words branching off of that letter
    if trie.startsWith(word):
       for i in range(-1, 2):
          for j in range(-1, 2):
@@ -124,8 +134,6 @@ def findWordsHelper(board, trie, x, y, visited, word, words, wordLocationArray, 
 
 # find all words in the board 
 words = findWords(board, trie)
-
-print(words)
 
 # generate a GUI to show the board
 layout = [[sg.Button(board[x][y], size=(3, 3), pad=(1, 1), button_color=('white', 'black'), key=(x, y)) for y in range(COLS)] for x in range(ROWS)]
