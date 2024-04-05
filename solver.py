@@ -65,7 +65,7 @@ for p_element in p_elements:
       break
 
 print(f"Number of theme words: {num_words}")
-   
+
 # get the puzzle and store as 2d array
 board_from_web = WebDriverWait(driver, 2).until(expected_conditions.presence_of_element_located((By.CLASS_NAME, board_class)))
 board = [[0 for x in range(COLS)] for y in range(ROWS)]
@@ -82,7 +82,7 @@ printBoard(board)
 
 # insert all english words into a trie
 trie = Trie()
-with open("words_alpha.txt", "r") as file:
+with open("wiki-100k.txt", "r") as file:
    for line in file:
 
       # make sure the word is within the min/max length and is alphabetical
@@ -95,6 +95,14 @@ with open("words_alpha.txt", "r") as file:
 # where each bit represents a letter in the board
 # with 1 being the letter is used and 0 being the letter is not used in the word
    
+def arrayToBinary(array):
+   binary = 0
+   for x in range(ROWS):
+      for y in range(COLS):
+         binary <<= 1
+         binary += array[x][y]
+   return binary
+
 def findWords(board, trie):
    words = []
    wordsArray = []
@@ -106,7 +114,7 @@ def findWords(board, trie):
          visited = [[False for i in range(COLS)] for j in range(ROWS)]
          wordLocationArray = [[0 for i in range(COLS)] for j in range(ROWS)]
          findWordsHelper(board, trie, x, y, visited, board[x][y], words, wordLocationArray, wordsArray)
-   return wordsArray
+   return words, wordsArray
 
 # helper function to find all words that start with a given letter on the board
 def findWordsHelper(board, trie, x, y, visited, word, words, wordLocationArray, wordsArray):
@@ -116,11 +124,7 @@ def findWordsHelper(board, trie, x, y, visited, word, words, wordLocationArray, 
    # check if the current thing is a word
    if trie.search(word):
       words.append(word)
-      wordsArray.append(wordLocationArray)
-      """
-      if(word == "moan"):
-         print(word)
-         printBoard(wordLocationArray)"""
+      wordsArray.append(arrayToBinary(wordLocationArray))
 
    # check all the words branching off of that letter
    if trie.startsWith(word):
@@ -132,9 +136,31 @@ def findWordsHelper(board, trie, x, y, visited, word, words, wordLocationArray, 
    visited[x][y] = False 
    wordLocationArray[x][y] = 0
 
-# find all words in the board 
-words = findWords(board, trie)
+def count_ones(binary_number):
+    count = 0
+    while binary_number:
+        count += binary_number & 1
+        binary_number >>= 1
+    return count
 
+# find all words in the board 
+words, wordsInBinary = findWords(board, trie)
+
+for i in range(len(wordsInBinary)):
+   for j in range(i + 1, len(wordsInBinary)):
+      if wordsInBinary[i] & wordsInBinary[j] == 0:
+         thingToConsider = wordsInBinary[i] | wordsInBinary[j]
+         for k in range(j + 1, len(wordsInBinary)):
+            if thingToConsider & wordsInBinary[k] == 0:
+               thingsToConsider = thingToConsider | wordsInBinary[k]
+               for l in range(k + 1, len(wordsInBinary)):
+                  if thingsToConsider & wordsInBinary[l] == 0:
+                     thingsToConsider = thingsToConsider | wordsInBinary[l]
+                     for m in range(l + 1, len(wordsInBinary)):
+                        if thingsToConsider & wordsInBinary[m] == 0:
+                           thingsToConsider = thingsToConsider | wordsInBinary[m]
+                           if count_ones(thingsToConsider) >= 36:
+                              print(words[i], words[j], words[k], words[l], words[m])
 # generate a GUI to show the board
 layout = [[sg.Button(board[x][y], size=(3, 3), pad=(1, 1), button_color=('white', 'black'), key=(x, y)) for y in range(COLS)] for x in range(ROWS)]
 window = sg.Window("Strands Solver", layout)
