@@ -166,11 +166,14 @@ for i in range(len(wordsInBinary)):
                      for m in range(l + 1, len(wordsInBinary)):
                         if thingsToConsider & wordsInBinary[m] == 0:
                            thingsToConsider = thingsToConsider | wordsInBinary[m]
-                           if count_ones(thingsToConsider) >= 36:
-                              count += 1
-                              if(count % 1000 == 0):
-                                 print(count)
-                              #print(words[i], words[j], words[k], words[l], words[m])
+                           for n in range(m + 1, len(wordsInBinary)):
+                              if thingsToConsider & wordsInBinary[n] == 0:
+                                 thingsToConsider = thingsToConsider | wordsInBinary[n]
+                                 for o in range(n+1, len(wordsInBinary)):
+                                    if thingsToConsider & wordsInBinary[o] == 0:
+                                       thingsToConsider = thingsToConsider | wordsInBinary[o]
+                                       if count_ones(thingsToConsider) >= 36:
+                                          print(words[i], words[j], words[k], words[l], words[m], words[n], words[o])
 
 print(count)
 # generate a GUI to show the board
