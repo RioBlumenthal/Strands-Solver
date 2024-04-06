@@ -78,6 +78,8 @@ for x in range(ROWS):
 # close the web browser
 driver.quit()
 
+print(board)
+
 def is_lowercase(word):
     return bool(re.match(r'^[a-z]+$', word))
 
@@ -143,6 +145,7 @@ def findWordsHelper(board, trie, x, y, visited, word, words, wordLocationArray, 
    visited[x][y] = False 
    wordLocationArray[x][y] = 0
 
+# function to count the number of 1s in a binary number
 def countOnes(binary_number):
     count = 0
     while binary_number:
@@ -216,14 +219,13 @@ def checkSpangram(binary_number):
             return True
 
         # Directions for movement (sideways and downwards)
-        directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
+        directions = [(0, 1), (1, 0), (1, 1), (1, -1), (0,-1)]
 
         # Explore neighbors
         for dr, dc in directions:
             nr, nc = row + dr, col + dc
             if 0 <= nr < rows and 0 <= nc < cols and matrix[nr][nc] == 1 and not visited[nr][nc]:
-                if dfs_top_down(nr, nc, count):
-                    return True
+                return dfs_top_down(nr, nc, count)
         
         # Backtrack
         visited[row][col] = False
@@ -241,7 +243,7 @@ def checkSpangram(binary_number):
             return True
 
         # Directions for movement (upwards, downwards, and sideways)
-        directions = [(-1, 0), (1, 0), (0, 1)]
+        directions = [(-1, 0), (1, 0), (0, 1), (-1,1), (1,1)]
 
         # Explore neighbors
         for dr, dc in directions:
@@ -290,6 +292,7 @@ def convertBinaryToWord(binary_number):
                 word += board[i][j]
             binary_number >>= 1
     return word
+
 
 def flipBits(binary_int, length=48):
     # Calculate the number of leading zeros needed
@@ -348,3 +351,6 @@ while True:
         window[event].update(button_color=('white', 'black'))
 
 window.close()
+
+#prior photograph amer clin time fight sash tahnilcami
+#prior photography amer clin time fight sash tahnilami

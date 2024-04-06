@@ -8,4 +8,18 @@ numbers = [
     0b000000000010000000010000001000000000000000000000
 ]
 
-print(numbers[0] & numbers[1])
+numbers2 = [
+   0b110110111101011010111100101111111111111110111110,
+   0b110110111101011110111111101111101111111010011100,
+   0b110110111101011110111111101111111110111110111110
+]
+
+def countOnes(binary_number):
+    count = 0
+    while binary_number:
+        count += binary_number & 1
+        binary_number >>= 1
+    return count
+
+for number in numbers2:
+    print(countOnes(number))
