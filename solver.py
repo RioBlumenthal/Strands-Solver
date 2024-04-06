@@ -143,17 +143,171 @@ def findWordsHelper(board, trie, x, y, visited, word, words, wordLocationArray, 
    visited[x][y] = False 
    wordLocationArray[x][y] = 0
 
-def count_ones(binary_number):
+def countOnes(binary_number):
     count = 0
     while binary_number:
         count += binary_number & 1
         binary_number >>= 1
     return count
 
+def convertBinaryToMatrix(binary_number):
+    matrix = [[0 for _ in range(COLS)] for _ in range(ROWS)]
+    for i in range(ROWS - 1, -1, -1):
+        for j in range(COLS - 1, -1, -1):
+            matrix[i][j] = binary_number & 1
+            binary_number >>= 1
+    return matrix
+
+"""
+def checkSpangram(binary_number):
+    matrix = convertBinaryToMatrix(binary_number)
+    def dfs(row, col, count):
+        # Mark current cell as visited
+        visited[row][col] = True
+        count[0] += 1
+
+        # Check if we visited all 1s
+        if count[0] == total_ones:
+            return True
+
+        # Directions for movement (sideways and downwards)
+        directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
+
+        # Explore neighbors
+        for dr, dc in directions:
+            nr, nc = row + dr, col + dc
+            if 0 <= nr < rows and 0 <= nc < cols and matrix[nr][nc] == 1 and not visited[nr][nc]:
+                if dfs(nr, nc, count):
+                    return True
+        
+        # Backtrack
+        visited[row][col] = False
+        count[0] -= 1
+
+        return False
+
+    # Dimensions of the matrix
+    rows, cols = len(matrix), len(matrix[0])
+
+    # Count the total number of 1s in the matrix
+    total_ones = sum(row.count(1) for row in matrix)
+
+    # Initialize visited array
+    visited = [[False] * cols for _ in range(rows)]
+
+    # Start DFS from each cell in the first row
+    for col in range(cols):
+        if matrix[0][col] == 1:
+            if dfs(0, col, [0]):
+                return True
+    
+    return False
+"""
+
+def checkSpangram(binary_number):
+    matrix = convertBinaryToMatrix(binary_number)
+    def dfs_top_down(row, col, count):
+        # Mark current cell as visited
+        visited[row][col] = True
+        count[0] += 1
+
+        # Check if we visited all 1s
+        if count[0] == total_ones:
+            return True
+
+        # Directions for movement (sideways and downwards)
+        directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
+
+        # Explore neighbors
+        for dr, dc in directions:
+            nr, nc = row + dr, col + dc
+            if 0 <= nr < rows and 0 <= nc < cols and matrix[nr][nc] == 1 and not visited[nr][nc]:
+                if dfs_top_down(nr, nc, count):
+                    return True
+        
+        # Backtrack
+        visited[row][col] = False
+        count[0] -= 1
+
+        return False
+
+    def dfs_left_right(row, col, count):
+        # Mark current cell as visited
+        visited[row][col] = True
+        count[0] += 1
+
+        # Check if we visited all 1s
+        if count[0] == total_ones:
+            return True
+
+        # Directions for movement (upwards, downwards, and sideways)
+        directions = [(-1, 0), (1, 0), (0, 1)]
+
+        # Explore neighbors
+        for dr, dc in directions:
+            nr, nc = row + dr, col + dc
+            if 0 <= nr < rows and 0 <= nc < cols and matrix[nr][nc] == 1 and not visited[nr][nc]:
+                if dfs_left_right(nr, nc, count):
+                    return True
+        
+        # Backtrack
+        visited[row][col] = False
+        count[0] -= 1
+
+        return False
+
+    # Dimensions of the matrix
+    rows, cols = len(matrix), len(matrix[0])
+
+    # Count the total number of 1s in the matrix
+    total_ones = sum(row.count(1) for row in matrix)
+
+    # Initialize visited array
+    visited = [[False] * cols for _ in range(rows)]
+
+    # Check if there's a path from top to bottom
+    for col in range(cols):
+        if matrix[0][col] == 1:
+            if dfs_top_down(0, col, [0]):
+                return True
+
+    # Re-initialize visited array for checking from left to right
+    visited = [[False] * cols for _ in range(rows)]
+
+    # Check if there's a path from left to right
+    for row in range(rows):
+        if matrix[row][0] == 1:
+            if dfs_left_right(row, 0, [0]):
+                return True
+
+    return False
+
+def convertBinaryToWord(binary_number):
+    word = ""
+    for i in range(ROWS - 1, -1, -1):
+        for j in range(COLS - 1, -1, -1):
+            if binary_number & 1:
+                word += board[i][j]
+            binary_number >>= 1
+    return word
+
+def flipBits(binary_int, length=48):
+    # Calculate the number of leading zeros needed
+    num_zeros = max(0, length - binary_int.bit_length())
+    
+    # Calculate the mask with all bits set to 1 up to the highest bit
+    mask = (1 << binary_int.bit_length()) - 1
+    
+    # Flip the bits using bitwise XOR operation with the mask
+    flipped_int = (binary_int ^ mask) << num_zeros
+    
+    return flipped_int
+
 # find all words in the board 
 words, wordsInBinary = findWords(board, trie)
 count = 0
 for i in range(len(wordsInBinary)):
+   print(words[i])
    for j in range(i + 1, len(wordsInBinary)):
       if wordsInBinary[i] & wordsInBinary[j] == 0:
          thingToConsider = wordsInBinary[i] | wordsInBinary[j]
@@ -172,17 +326,25 @@ for i in range(len(wordsInBinary)):
                                  for o in range(n+1, len(wordsInBinary)):
                                     if thingsToConsider & wordsInBinary[o] == 0:
                                        thingsToConsider = thingsToConsider | wordsInBinary[o]
-                                       if count_ones(thingsToConsider) >= 36:
-                                          print(words[i], words[j], words[k], words[l], words[m], words[n], words[o])
+                                       if countOnes(thingsToConsider) >= 36:
+                                          spangram = flipBits(thingsToConsider)
+                                          if(checkSpangram(spangram)):
+                                             count += 1
+                                             print(words[i], words[j], words[k], words[l], words[m], words[n], words[o], convertBinaryToWord(spangram))
 
 print(count)
+
 # generate a GUI to show the board
 layout = [[sg.Button(board[x][y], size=(3, 3), pad=(1, 1), button_color=('white', 'black'), key=(x, y)) for y in range(COLS)] for x in range(ROWS)]
 window = sg.Window("Strands Solver", layout)
 
 while True:
-   event, values = window.read()
-   if event == sg.WINDOW_CLOSED:
-      break
+    event, values = window.read()
+    if event == sg.WINDOW_CLOSED:
+        break
+    elif isinstance(event, tuple):  # Check if the clicked element is a button
+        button_key = event
+        # Update button color to white
+        window[event].update(button_color=('white', 'black'))
 
 window.close()
